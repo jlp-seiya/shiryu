@@ -5,7 +5,7 @@ INDENT = "&emsp;"
 def diff(a, b):
     aout = []
     bout = []
-    diff_recursive(a, b, aout, bout, 0)
+    diff_recursive(a, b, aout, bout, 0, True, True)
 
     output = []
     print("aout len:%d" % len(aout))
@@ -33,7 +33,7 @@ def diff(a, b):
 def diff_html(a, b):
     aout = []
     bout = []
-    diff_recursive(a, b, aout, bout, 0)
+    diff_recursive(a, b, aout, bout, 0, True, True)
 
     left_output = []
     right_output = []
@@ -50,65 +50,88 @@ def diff_html(a, b):
                 left_output.append(ao["lines"][i])
                 right_output.append(bo["lines"][i])
         else:
+            if a_len == 0:
+                left_output.append('<span style="background-color: #DAF7A6">')
+                right_output.append('<span style="background-color: #DAF7A6">')
+            elif b_len == 0:
+                left_output.append('<span style="background-color: #F08080">')
+                right_output.append('<span style="background-color: #F08080">')
+            else:
+                left_output.append('<span style="background-color: #f7dc6f">')
+                right_output.append('<span style="background-color: #f7dc6f">')
+
             if a_len >= b_len:
                 for i in range(0, a_len):
                     left_output.append(ao["lines"][i])
                 for i in range(0, b_len):
                     right_output.append(bo["lines"][i])
                 for i in range(b_len, a_len):
-                    right_output.append("")
+                    right_output.append(" <br/>")
             else:
                 for i in range(0, a_len):
                     left_output.append(ao["lines"][i])
                 for i in range(0, b_len):
                     right_output.append(bo["lines"][i])
                 for i in range(a_len, b_len):
-                    left_output.append("")
+                    left_output.append(" <br/>")
+            left_output.append('</span>')
+            right_output.append('</span>')
     
     print("\n".join(left_output))
     print("\n".join(right_output))
     return (left_output, right_output)
     
+def make_html_line(a, lines, block_type):
+    if block_type.startswith("same"):
+        lines.appennd(a)
+    else:
+        lines.append
 
-def diff_recursive(a, b, aout, bout, indent):
+def diff_recursive(a, b, aout, bout, indent, a_last, b_last):
     a_type = type(a)
     b_type = type(b)
 
     space = INDENT * indent
     if a_type != b_type:
-        add_block(a, aout, indent + 1)
-        add_block(b, bout, indent + 1)
+        add_block(a, aout, indent + 1, a_last)
+        add_block(b, bout, indent + 1, b_last)
  
     elif isinstance(a, dict):
         a_keys = a.keys()
         b_keys = b.keys()
         all_keys = set().union(a_keys, b_keys)
-        first = True
         add_begin_block("{", aout, indent)
         add_begin_block("{", bout, indent)
+        a_i = 0
+        b_i = 0
+        a_len = len(a)
+        b_len = len(b)
         for key in all_keys:
             if key in a:
+                a_i += 1
                 if key in b:
+                    b_i +=1
                     add_key_block(key, aout, indent + 1, "same")
                     add_key_block(key, bout, indent + 1, "same")
-                    diff_recursive(a[key], b[key], aout, bout, indent + 1)
+                    diff_recursive(a[key], b[key], aout, bout, indent + 1,
+                        a_i == a_len, b_i == b_len)
                 else:
                     add_key_block(key, aout, indent + 1, "diff")
-                    add_block(a[key], aout, indent + 1)
+                    add_block(a[key], aout, indent + 1, a_i == a_len)
                     add_empty_block(bout)
                     add_empty_block(bout)
 
             else:
                 if key in b:
+                    b_i += 1
                     add_key_block(key, bout, indent + 1, "diff")
-                    add_block(b[key], bout, indent + 1)
+                    add_block(b[key], bout, indent + 1, b_i == b_len)
                     add_empty_block(aout)
                     add_empty_block(aout)
                 else:
                     raise Exception("Unknow key:%s" % key)
-            first = False
-        add_end_block("}", aout, indent)
-        add_end_block("}", bout, indent)
+        add_end_block("}", aout, indent, a_last)
+        add_end_block("}", bout, indent, b_last)
     elif isinstance(a, list):
         a_size = len(a)
         b_size = len(b)
@@ -118,8 +141,8 @@ def diff_recursive(a, b, aout, bout, indent):
             diff_recursive(a[i], b[i], aout, bout, indent + 1)
 
     else:
-        add_block(a, aout, indent + 1)
-        add_block(b, bout, indent + 1)
+        add_block(a, aout, indent + 1, a_last)
+        add_block(b, bout, indent + 1, b_last)
 
 def add_begin_block(sym, aout, indent):
     space = INDENT * indent
@@ -127,16 +150,20 @@ def add_begin_block(sym, aout, indent):
     lines = []
     block["lines"] = lines
     block["type"] = "same-begin"
-    lines.append('%s%s' % (sym, space))
+    lines.append('%s%s<br/>' % (sym, space))
     aout.append(block)
 
-def add_end_block(sym, aout, indent):
+def add_end_block(sym, aout, indent, is_last):
     space = INDENT * indent
     block = {}
     lines = []
     block["lines"] = lines
     block["type"] = "same-end"
-    lines.append('%s%s' % (sym, space))
+    if is_last:
+        lines.append('%s%s<br/>' % (sym, space))
+    else:
+        lines.append('%s%s,<br/>' % (sym, space))
+
     aout.append(block)
 
 def add_empty_block(aout):
@@ -151,43 +178,52 @@ def add_key_block(key, aout, indent, same):
     lines = []
     block["lines"] = lines
     block["type"] = same + "-key"
-    lines.append('%s"%s" :' % (space, key))
+    lines.append('%s"%s" :<br/>' % (space, key))
     aout.append(block)
 
-def add_block(a, aout, indent):
+def add_block(a, aout, indent, is_last):
     block = {}
     lines = []
     block["lines"] = lines
     block["type"] = "diff-regular"
-    to_string(a, lines, indent)
+    to_string(a, lines, indent, is_last)
     aout.append(block)
 
-def to_string(a, lines, indent):
+def to_string(a, lines, indent, is_last):
     space = INDENT * indent
     if isinstance(a, dict):
-        lines.append('%s{' % space)
-        first = True
+        lines.append('%s{<br/>' % space)
+        i = 0
+        a_len = len(a)
         for key in a.keys():
-            if not first:
-                lines[-1] += ','
-            lines.append('%s%s"%s" : ' % (space, INDENT, key))
-            to_string(a[key], lines, indent + 1)
-            first = False
-        lines.append('%s}' % space)
-    elif isinstance(a, list):
-        lines.append('%s[' % space)
-
-        first = True
-        for val in a:
-            if not first:
-                lines[-1] += ','
-            to_string(val, lines, indent + 1)
-            first = False
-        lines.append('%s]' % space)
-    else:
-        if isinstance(a, str) or isinstance(a, unicode):
-            lines.append('%s"%s"' % (space, a))
+            i += 1
+            lines.append('%s%s"%s" :<br/>' % (space, INDENT, key))
+            to_string(a[key], lines, indent + 1, i == a_len)
+        if is_last:
+            lines.append('%s}<br/>' % space)
         else:
-            lines.append('%s%s' % (space, str(a)))
+            lines.append('%s},<br/>' % space)
+    elif isinstance(a, list):
+        lines.append('%s[<br/>' % space)
+        i = 0
+        a_len = len(a)
+        for val in a:
+            i += 1
+            to_string(val, lines, indent + 1, i == a_len)
+        if is_last:
+	    lines.append('%s]<br/>' % space)
+        else:
+	    lines.append('%s],<br/>' % space)
+    else:
+        if is_last:
+            if isinstance(a, str) or isinstance(a, unicode):
+                lines.append('%s"%s"<br/>' % (space, a))
+            else:
+                lines.append('%s%s<br/>' % (space, str(a)))
+        else:
+            if isinstance(a, str) or isinstance(a, unicode):
+                lines.append('%s"%s",<br/>' % (space, a))
+            else:
+                lines.append('%s%s,<br/>' % (space, str(a)))
 
  

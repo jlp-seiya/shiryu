@@ -4,29 +4,21 @@
 <title>JsonDiff By Seiya</title>
 </head>
 <body>
-<form method="post" action="https://jsondiff-dot-saintseiya-160804.appspot.com">
-<textarea name="myTextBox" cols="50" rows="5">
-Enter some text...
-</textarea>
-<br />
-<input type="submit" />
-</form>
 
-<br />
-<br />
+<h1 align="left">JsonDiff By Seiya</h1>
 
 <form method="post" action="https://jsondiff-dot-saintseiya-160804.appspot.com/login">
-<table style="width:100%" border="1">
+<table style="width:100%;">
 <tr>
-  <td width="50%">
-  <textarea name="aStr" style="resize:none; border: none; width: 100%; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;">{"abc":1}</textarea>
+  <td width="50%" style="border: solid 1px orange">
+  <textarea name="aStr" rows="10" style="resize:none; border:none; width: 100%; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;">{"abc":1}</textarea>
   </td>
-  <td width="50%">
-  <textarea name="bStr" style="resize:none; border: none; width: 100%; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;">{"abc":2}</textarea>
+  <td width="50%" style="border: solid 1px orange">
+  <textarea name="bStr" rows="10" style="resize:none; border:none; width: 100%; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;">{"abc":2}</textarea>
   </td>
 </tr>
 </table>
-<table style="width:100%" border="1">
+<table style="width:100%">
 <tr>
   <th>
   <input name="" type="submit" value="save">
@@ -36,7 +28,7 @@ Enter some text...
 </form>
 
 <br />
-<table style="width:100%" border="1">
+<table style="width:100%">
 <tr>
 <td width="50%">{{ leftInput }}</td>
 <td width="50%">{{ rightInput }}</td>
@@ -46,14 +38,14 @@ Enter some text...
 <br />
 <br />
 
-<table style="width:100%" border="1">
+<table style="width:100%">
 <tr>
-<td width="50%" align="left">
+<td width="50%" align="left" style="border: solid 1px orange">
 {% autoescape false %}
     {{leftDiff}}
 {% endautoescape %}
 </td>
-<td width="50%" align="left">
+<td width="50%" align="left" style="border: solid 1px orange">
 {% autoescape false %}
     {{rightDiff}}
 {% endautoescape %}

@@ -52,8 +52,8 @@ def login():
 
     if status:
         output = mydiff.diff_html(x, y)
-        leftDiff = "<br/>".join(output[0])
-        rightDiff = "<br/>".join(output[1])
+        leftDiff = "\n".join(output[0])
+        rightDiff = "\n".join(output[1])
     else:
         leftDiff = ""
         rightDiff = ""
