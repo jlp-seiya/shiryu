@@ -12,15 +12,60 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import webapp2
-import jsondiff
+import logging
+import json
+import mydiff
 
-class MainPage(webapp2.RequestHandler):
-    def get(self):
-        self.response.headers['Content-Type'] = 'text/plain'
-        self.response.write('Hello, World!!!!')
+from flask import Flask
+from flask import render_template
+from flask import request
+
+app = Flask(__name__)
 
 
-app = webapp2.WSGIApplication([
-    ('/', MainPage),
-], debug=True)
+@app.route('/')
+def hello():
+    x = json.loads('{ "a":"b", "c": { "c":1} }')
+    y = json.loads('{ "a":1, "b":[1,2]}')
+    output = mydiff.diff(x,y)
+    return "\n".join(output)
+
+
+@app.route('/login', methods=['POST', 'GET'])
+def login():
+    aStr = request.form.get("aStr")
+    bStr = request.form.get("bStr")
+    logging.info("astr:%s" % aStr)
+    logging.info("bstr:%s" % bStr)
+
+    status = True
+    try:
+        x = json.loads(aStr)
+    except:
+        x = "Invalid Json"
+        status = False
+    try:
+        y = json.loads(bStr)
+    except:
+        y = "Invalid Json"
+        status = False
+
+    if status:
+        output = mydiff.diff_html(x, y)
+        leftDiff = "<br/>".join(output[0])
+        rightDiff = "<br/>".join(output[1])
+    else:
+        leftDiff = ""
+        rightDiff = ""
+
+    return render_template('template.html', 
+        leftInput = x,
+        rightInput = y,
+        leftDiff = leftDiff,
+        rightDiff = rightDiff)
+
+@app.errorhandler(500)
+def server_error(e):
+    # Log the error and stacktrace.
+    logging.exception('An error occurred during a request.')
+    return 'An internal error occurred.', 500

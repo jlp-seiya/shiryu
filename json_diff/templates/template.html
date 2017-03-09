@@ -1,0 +1,69 @@
+<!doctype html>
+<html>
+<head>
+<title>JsonDiff By Seiya</title>
+</head>
+<body>
+<form method="post" action="https://jsondiff-dot-saintseiya-160804.appspot.com">
+<textarea name="myTextBox" cols="50" rows="5">
+Enter some text...
+</textarea>
+<br />
+<input type="submit" />
+</form>
+
+<br />
+<br />
+
+<form method="post" action="https://jsondiff-dot-saintseiya-160804.appspot.com/login">
+<table style="width:100%" border="1">
+<tr>
+  <td width="50%">
+  <textarea name="aStr" style="resize:none; border: none; width: 100%; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;">{"abc":1}</textarea>
+  </td>
+  <td width="50%">
+  <textarea name="bStr" style="resize:none; border: none; width: 100%; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;">{"abc":2}</textarea>
+  </td>
+</tr>
+</table>
+<table style="width:100%" border="1">
+<tr>
+  <th>
+  <input name="" type="submit" value="save">
+  </th>
+</tr>
+</table>
+</form>
+
+<br />
+<table style="width:100%" border="1">
+<tr>
+<td width="50%">{{ leftInput }}</td>
+<td width="50%">{{ rightInput }}</td>
+</tr>
+</table>
+
+<br />
+<br />
+
+<table style="width:100%" border="1">
+<tr>
+<td width="50%" align="left">
+{% autoescape false %}
+    {{leftDiff}}
+{% endautoescape %}
+</td>
+<td width="50%" align="left">
+{% autoescape false %}
+    {{rightDiff}}
+{% endautoescape %}
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+</body>
+</html>
