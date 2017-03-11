@@ -23,7 +23,7 @@ from flask import request
 app = Flask(__name__)
 
 
-@app.route('/')
+@app.route('/hello')
 def hello():
     x = json.loads('{ "a":"b", "c": { "c":1} }')
     y = json.loads('{ "a":1, "b":[1,2]}')
@@ -31,38 +31,46 @@ def hello():
     return "\n".join(output)
 
 
-@app.route('/login', methods=['POST', 'GET'])
+@app.route('/', methods=['GET', 'POST'])
 def login():
     aStr = request.form.get("aStr")
     bStr = request.form.get("bStr")
+    logging.info("Method:%s", request.method)
     logging.info("astr:%s" % aStr)
     logging.info("bstr:%s" % bStr)
+
+
+    if request.method == 'POST':
+        leftOrig = aStr
+        rightOrig = bStr
+    else:
+        leftOrig = '{\n "key1" :\n  1,\n "key2" :\n  [1,3]\n}'
+        rightOrig = '{\n "key2" :\n  [1,2,3]}'
 
     status = True
     try:
         x = json.loads(aStr)
+        leftDiff = "Valid Json"
     except:
-        x = "Invalid Json"
+        leftDiff = "Invalid Json"
         status = False
     try:
         y = json.loads(bStr)
+        rightDiff = "Valid Json"
     except:
-        y = "Invalid Json"
+        rightDiff = "Invalid Json"
         status = False
 
     if status:
         output = mydiff.diff_html(x, y)
         leftDiff = "\n".join(output[0])
         rightDiff = "\n".join(output[1])
-    else:
-        leftDiff = ""
-        rightDiff = ""
 
     return render_template('template.html', 
-        leftInput = x,
-        rightInput = y,
         leftDiff = leftDiff,
-        rightDiff = rightDiff)
+        rightDiff = rightDiff,
+        leftOrig = leftOrig,
+        rightOrig = rightOrig)
 
 @app.errorhandler(500)
 def server_error(e):

@@ -7,34 +7,33 @@
 
 <h1 align="left">JsonDiff By Seiya</h1>
 
-<form method="post" action="https://jsondiff-dot-saintseiya-160804.appspot.com/login">
+<table style="width:100%;">
+<tr>
+  <td width="50%" style="border: none">Please paste first json below</td>
+  <td width="50%" style="border: none">Please paste second json below</td>
+</tr>
+</table>
+<form method="post">
 <table style="width:100%;">
 <tr>
   <td width="50%" style="border: solid 1px orange">
-  <textarea name="aStr" rows="10" style="resize:none; border:none; width: 100%; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;">{"abc":1}</textarea>
+  <textarea name="aStr" rows="10" style="resize:none; border:none; width: 100%; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;">{{leftOrig}}</textarea>
   </td>
   <td width="50%" style="border: solid 1px orange">
-  <textarea name="bStr" rows="10" style="resize:none; border:none; width: 100%; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;">{"abc":2}</textarea>
+  <textarea name="bStr" rows="10" style="resize:none; border:none; width: 100%; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;">{{rightOrig}}</textarea>
   </td>
 </tr>
 </table>
 <table style="width:100%">
 <tr>
   <th>
-  <input name="" type="submit" value="save">
+  <input name="" type="submit" value="Get diff">
   </th>
 </tr>
 </table>
 </form>
 
 <br />
-<table style="width:100%">
-<tr>
-<td width="50%">{{ leftInput }}</td>
-<td width="50%">{{ rightInput }}</td>
-</tr>
-</table>
-
 <br />
 <br />
 
